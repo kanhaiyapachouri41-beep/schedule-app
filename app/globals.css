@@ -161,3 +161,19 @@ body {
 .animate-fadeIn {
   animation: fadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-cardIn {
+  animation: cardIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes tabSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-tabSlideIn {
+  animation: tabSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

@@ -8,10 +8,11 @@ interface Props {
   programme: Programme
   onDone: (selected: string[]) => void
   onBack: () => void
+  initialSelected?: string[]
 }
 
-export function SubjectPicker({ groups, onDone, onBack }: Props) {
-  const [selected, setSelected] = useState<Set<string>>(new Set())
+export function SubjectPicker({ groups, onDone, onBack, initialSelected = [] }: Props) {
+  const [selected, setSelected] = useState<Set<string>>(new Set(initialSelected))
   const [query, setQuery] = useState('')
 
   const filtered = useMemo(() => {

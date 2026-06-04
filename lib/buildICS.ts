@@ -1,18 +1,27 @@
 import { ClassEntry } from './types'
 
-function buildTitle(entry: ClassEntry): string {
-  const batchMatch = entry.subject.match(/-([A-C])$/)
-  const batch = batchMatch ? ` (Batch ${batchMatch[1]})` : ''
-  return `${entry.subjectFull}${batch} — ${entry.classroom}`
-}
-
 function escapeICS(str: string): string {
-  return str.replace(/([,;\\])/g, '\\$1')
-    .replace(/\n/g, '\\n')
+  return str.replace(/([,;\\])/g, '\\$1').replace(/\n/g, '\\n')
 }
 
 function generateUID(entry: ClassEntry): string {
-  return `${entry.date}-${entry.dtStart}-${entry.classroom}@schedule-app.local`
+  return `${entry.dtStart}-${entry.classroom}@iimk-schedule`
+}
+
+function buildTitle(entry: ClassEntry): string {
+  const batchMatch = entry.subject.match(/-([A-C])$/)
+  const batch = batchMatch ? ` · Batch ${batchMatch[1]}` : ''
+  return `${entry.subjectFull}${batch}`
+}
+
+function buildDescription(entry: ClassEntry): string {
+  const batchMatch = entry.subject.match(/-([A-C])$/)
+  const lines: string[] = []
+  if (entry.faculty) lines.push(`Faculty: ${entry.faculty}`)
+  if (batchMatch) lines.push(`Batch: ${batchMatch[1]}`)
+  lines.push(`Section: ${entry.classroom}`)
+  lines.push('IIM Kozhikode')
+  return lines.join('\\n')
 }
 
 export function buildICS(entries: ClassEntry[]): string {
@@ -20,12 +29,12 @@ export function buildICS(entries: ClassEntry[]): string {
 
   let ics = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Schedule App//NONSGML Event//EN
+PRODID:-//IIM Kozhikode Schedule//EN
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-X-WR-CALNAME:Class Schedule
+X-WR-CALNAME:IIMK Class Schedule
 X-WR-TIMEZONE:Asia/Kolkata
-X-WR-CALDESC:Personal class schedule
+X-WR-CALDESC:Personal class schedule — IIM Kozhikode
 BEGIN:VTIMEZONE
 TZID:Asia/Kolkata
 BEGIN:STANDARD
@@ -38,25 +47,20 @@ END:VTIMEZONE
 `
 
   for (const entry of entries) {
-    const title = buildTitle(entry)
-    const uid = generateUID(entry)
-    const location = `Classroom ${entry.classroom}`
-    const description = entry.faculty
-    const startDT = entry.dtStart
-    const endDT = entry.dtEnd
-
     ics += `BEGIN:VEVENT
-UID:${uid}
+UID:${generateUID(entry)}
 DTSTAMP:${now}
-DTSTART:${startDT}
-DTEND:${endDT}
-SUMMARY:${escapeICS(title)}
-LOCATION:${escapeICS(location)}
-DESCRIPTION:${escapeICS(description)}
+DTSTART;TZID=Asia/Kolkata:${entry.dtStart}
+DTEND;TZID=Asia/Kolkata:${entry.dtEnd}
+SUMMARY:${escapeICS(buildTitle(entry))}
+LOCATION:${escapeICS(`Section ${entry.classroom}, IIM Kozhikode`)}
+DESCRIPTION:${buildDescription(entry)}
+STATUS:CONFIRMED
+TRANSP:OPAQUE
 BEGIN:VALARM
 TRIGGER:-PT15M
 ACTION:DISPLAY
-DESCRIPTION:Class starting in 15 minutes
+DESCRIPTION:Class in 15 minutes
 END:VALARM
 END:VEVENT
 `

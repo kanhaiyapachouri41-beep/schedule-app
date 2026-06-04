@@ -1,22 +1,46 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Programme, ClassEntry, SubjectGroup } from '@/lib/types'
-import { setPreferences } from '@/lib/storage'
+import { getPreferences, setPreferences } from '@/lib/storage'
 import { groupSubjectsByProgramme } from '@/lib/parseSheet'
 import { ProgrammePicker } from '@/components/onboarding/ProgrammePicker'
 import { SubjectPicker } from '@/components/onboarding/SubjectPicker'
 
 type Step = 'programme' | 'subjects'
 
-export default function OnboardingPage() {
+function OnboardingContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isEdit = searchParams.get('edit') === 'true'
+
   const [step, setStep] = useState<Step>('programme')
   const [programme, setProgramme] = useState<Programme | null>(null)
   const [groups, setGroups] = useState<SubjectGroup[]>([])
   const [loading, setLoading] = useState(false)
   const [fetchError, setFetchError] = useState<string | null>(null)
+  const [initialSubjects, setInitialSubjects] = useState<string[]>([])
+
+  useEffect(() => {
+    if (!isEdit) return
+    const prefs = getPreferences()
+    if (!prefs) { router.replace('/onboarding'); return }
+
+    setProgramme(prefs.programme)
+    setInitialSubjects(prefs.subjects)
+    setLoading(true)
+    fetch('/api/schedule')
+      .then(r => r.json())
+      .then(data => {
+        if (data.error) { setFetchError(data.error); return }
+        const classes: ClassEntry[] = data.classes ?? []
+        setGroups(groupSubjectsByProgramme(classes, prefs.programme))
+        setStep('subjects')
+      })
+      .catch(() => setFetchError('Network error. Please check your connection and try again.'))
+      .finally(() => setLoading(false))
+  }, [isEdit, router])
 
   async function handleProgrammeSelect(p: Programme) {
     setProgramme(p)
@@ -63,7 +87,7 @@ export default function OnboardingPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-6">
         <div
-          style={{ fontFamily: "'Cormorant Garamond', serif" }}
+          style={{ fontFamily: "'Fraunces', serif" }}
           className="text-2xl text-slate-300 text-center"
         >
           Could not load schedule
@@ -75,18 +99,18 @@ export default function OnboardingPage() {
           {fetchError}
         </div>
         <button
-          onClick={() => { setFetchError(null); setStep('programme') }}
+          onClick={() => { setFetchError(null); if (isEdit) router.push('/home'); else setStep('programme') }}
           style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.12em' }}
           className="text-[11px] text-yellow-400 uppercase border border-yellow-400/30 px-4 py-2 rounded hover:bg-yellow-400/10 transition-colors"
         >
-          ← Try Again
+          ← {isEdit ? 'Back to schedule' : 'Try Again'}
         </button>
       </div>
     )
   }
 
   return (
-    <div style={{ background: '#0C1220', minHeight: '100vh' }}>
+    <div style={{ background: '#090910', minHeight: '100vh' }}>
       {step === 'programme' && (
         <ProgrammePicker onSelect={handleProgrammeSelect} />
       )}
@@ -95,9 +119,27 @@ export default function OnboardingPage() {
           groups={groups}
           programme={programme}
           onDone={handleSubjectsDone}
-          onBack={() => setStep('programme')}
+          onBack={() => isEdit ? router.push('/home') : setStep('programme')}
+          initialSelected={initialSubjects}
         />
       )}
     </div>
+  )
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div
+          style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.2em', color: '#3E3C52' }}
+          className="text-[11px] uppercase animate-pulse"
+        >
+          Loading…
+        </div>
+      </div>
+    }>
+      <OnboardingContent />
+    </Suspense>
   )
 }

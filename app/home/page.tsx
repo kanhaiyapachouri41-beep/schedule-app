@@ -24,6 +24,29 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 
 type Tab = 'today' | 'week' | 'term'
 
+function SkeletonCard({ delay = 0 }: { delay?: number }) {
+  return (
+    <div
+      style={{
+        background: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        borderLeft: '3px solid rgba(255,255,255,0.06)',
+        borderRadius: '14px',
+        padding: '14px 18px 13px',
+        animationDelay: `${delay}ms`,
+      }}
+      className="animate-pulse"
+    >
+      <div className="flex items-center justify-between mb-2.5">
+        <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '4px', height: '12px', width: '72px' }} />
+        <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '6px', height: '20px', width: '30px' }} />
+      </div>
+      <div style={{ background: 'rgba(255,255,255,0.09)', borderRadius: '4px', height: '17px', width: '62%', marginBottom: '8px' }} />
+      <div style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '4px', height: '11px', width: '40%' }} />
+    </div>
+  )
+}
+
 export default function HomePage() {
   const router = useRouter()
   const [myClasses, setMyClasses] = useState<ClassEntry[]>([])
@@ -55,19 +78,6 @@ export default function HomePage() {
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [router])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div
-          style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.2em', color: '#3E3C52' }}
-          className="text-[11px] uppercase animate-pulse"
-        >
-          Loading…
-        </div>
-      </div>
-    )
-  }
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'today', label: 'Today' },
@@ -106,7 +116,35 @@ export default function HomePage() {
               </span>
             </div>
           </div>
-          <div className="pt-1">
+          <div className="flex items-center gap-2 pt-1">
+            {/* Edit subjects */}
+            <button
+              onClick={() => router.push('/onboarding?edit=true')}
+              title="Change subjects"
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '10px',
+                padding: '8px',
+                color: '#4E4B65',
+                transition: 'all 0.15s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = '#9E9CB8'
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.color = '#4E4B65'
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M9.5 2L12 4.5L4.5 12H2V9.5L9.5 2Z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
             <ExportButton classes={myClasses} />
           </div>
         </div>
@@ -139,11 +177,19 @@ export default function HomePage() {
       </div>
 
       {/* Tab content */}
-      <div className="px-5 pt-5 pb-24">
-        {activeTab === 'today' && <TodayTab classes={myClasses} />}
-        {activeTab === 'week' && <WeekTab classes={myClasses} />}
-        {activeTab === 'term' && <FullTermTab classes={myClasses} />}
-      </div>
+      {loading ? (
+        <div className="px-5 pt-5 pb-24 flex flex-col gap-2.5">
+          <SkeletonCard delay={0} />
+          <SkeletonCard delay={60} />
+          <SkeletonCard delay={120} />
+        </div>
+      ) : (
+        <div key={activeTab} className="px-5 pt-5 pb-24 animate-tabSlideIn">
+          {activeTab === 'today' && <TodayTab classes={myClasses} />}
+          {activeTab === 'week' && <WeekTab classes={myClasses} />}
+          {activeTab === 'term' && <FullTermTab classes={myClasses} />}
+        </div>
+      )}
     </main>
   )
 }
