@@ -32,8 +32,27 @@ export function ExportButton({ classes }: Props) {
   return (
     <button
       onClick={handleExport}
-      style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.1em' }}
-      className="text-[10px] uppercase text-yellow-400 border border-yellow-400/30 px-3 py-1.5 rounded-lg hover:bg-yellow-400/10 hover:border-yellow-400/60 transition-all active:scale-95"
+      style={{
+        fontFamily: "'JetBrains Mono', monospace",
+        letterSpacing: '0.1em',
+        background: 'rgba(201,166,82,0.1)',
+        border: '1px solid rgba(201,166,82,0.25)',
+        color: '#C9A652',
+        borderRadius: '10px',
+        padding: '8px 14px',
+        fontSize: '11px',
+        transition: 'all 0.15s ease',
+      }}
+      onMouseEnter={e => {
+        const t = e.currentTarget
+        t.style.background = 'rgba(201,166,82,0.18)'
+        t.style.borderColor = 'rgba(201,166,82,0.45)'
+      }}
+      onMouseLeave={e => {
+        const t = e.currentTarget
+        t.style.background = 'rgba(201,166,82,0.1)'
+        t.style.borderColor = 'rgba(201,166,82,0.25)'
+      }}
     >
       Export ↓
     </button>

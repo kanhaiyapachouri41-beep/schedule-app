@@ -46,35 +46,48 @@ export function SubjectPicker({ groups, onDone, onBack }: Props) {
     <div className="flex flex-col min-h-screen">
       {/* Sticky header */}
       <div
-        className="sticky top-0 z-10 px-6 py-4 border-b border-slate-800/60"
-        style={{ background: 'rgba(12,18,32,0.95)', backdropFilter: 'blur(8px)' }}
+        style={{
+          background: 'rgba(9,9,16,0.92)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+        }}
+        className="sticky top-0 z-10 px-5 pt-5 pb-4"
       >
         <button
           onClick={onBack}
-          style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.15em' }}
-          className="text-[10px] text-slate-500 uppercase mb-3 flex items-center gap-1.5 hover:text-slate-300 transition-colors"
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            letterSpacing: '0.15em',
+            color: '#4E4B65',
+          }}
+          className="text-[10px] uppercase mb-4 flex items-center gap-1.5 hover:text-stone-400 transition-colors"
         >
           ← Back
         </button>
         <h1
-          style={{ fontFamily: "'Cormorant Garamond', serif" }}
-          className="text-2xl text-slate-100 font-normal leading-tight"
+          style={{ fontFamily: "'Fraunces', serif", color: '#F0EDE8', fontWeight: 600 }}
+          className="text-2xl leading-tight"
         >
           Your{' '}
-          <em className="text-yellow-400 not-italic font-semibold">subjects</em>
+          <em style={{ color: '#C9A652', fontStyle: 'italic' }}>subjects</em>
         </h1>
         <p
-          style={{ fontFamily: "'JetBrains Mono', monospace" }}
-          className="text-[10px] text-slate-500 mt-1.5 tracking-wide"
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            letterSpacing: '0.14em',
+            color: selected.size > 0 ? '#C9A652' : '#3E3C52',
+          }}
+          className="text-[10px] uppercase mt-1.5 transition-colors"
         >
           {selected.size === 0
-            ? 'TAP YOUR ENROLLED SUBJECTS'
-            : `${selected.size} SUBJECT${selected.size > 1 ? 'S' : ''} SELECTED`}
+            ? 'Tap your enrolled subjects'
+            : `${selected.size} subject${selected.size > 1 ? 's' : ''} selected`}
         </p>
       </div>
 
-      {/* Subject rows */}
-      <div className="flex-1 px-5 py-2">
+      {/* Subject list */}
+      <div className="flex-1 px-5 py-1">
         {groups.map((group) => {
           const active = isSelected(group)
           const activeBatch = getSelectedBatch(group)
@@ -82,23 +95,31 @@ export function SubjectPicker({ groups, onDone, onBack }: Props) {
           return (
             <div
               key={group.base}
-              className={[
-                'flex items-center justify-between py-3.5 px-1 border-b transition-colors duration-150',
-                active ? 'border-yellow-500/20' : 'border-slate-800/50',
-              ].join(' ')}
+              style={{
+                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                transition: 'border-color 0.15s',
+              }}
+              className="flex items-center justify-between py-4 gap-4"
             >
-              <div className="flex-1 min-w-0 pr-4">
+              <div className="flex-1 min-w-0">
                 <div
-                  className={[
-                    'text-sm leading-snug transition-colors',
-                    active ? 'text-slate-100' : 'text-slate-300',
-                  ].join(' ')}
+                  style={{
+                    fontFamily: "'Outfit', sans-serif",
+                    color: active ? '#F0EDE8' : '#7E7C96',
+                    fontWeight: active ? 500 : 400,
+                    transition: 'color 0.15s',
+                  }}
+                  className="text-[14px] leading-snug"
                 >
                   {group.fullName}
                 </div>
                 <div
-                  style={{ fontFamily: "'JetBrains Mono', monospace" }}
-                  className="text-[9px] text-slate-600 mt-0.5 tracking-wider"
+                  style={{
+                    fontFamily: "'JetBrains Mono', monospace",
+                    color: '#2E2C40',
+                    letterSpacing: '0.12em',
+                  }}
+                  className="text-[9px] mt-0.5 uppercase"
                 >
                   {group.base}
                 </div>
@@ -107,12 +128,12 @@ export function SubjectPicker({ groups, onDone, onBack }: Props) {
               {group.batches.length > 0 ? (
                 <div className="flex gap-1.5 shrink-0">
                   {group.batches.map((batch) => {
-                    const isActive = activeBatch === batch
+                    const batchActive = activeBatch === batch
                     return (
                       <button
                         key={batch}
                         onClick={() =>
-                          isActive
+                          batchActive
                             ? setSelected((p) => {
                                 const n = new Set(p)
                                 n.delete(`${group.base}-${batch}`)
@@ -120,13 +141,19 @@ export function SubjectPicker({ groups, onDone, onBack }: Props) {
                               })
                             : selectBatch(group, batch)
                         }
-                        style={{ fontFamily: "'JetBrains Mono', monospace" }}
-                        className={[
-                          'w-8 h-8 rounded text-xs font-medium transition-all duration-150',
-                          isActive
-                            ? 'bg-yellow-400 text-slate-900 shadow-[0_0_10px_rgba(202,138,4,0.35)]'
-                            : 'bg-slate-800/80 text-slate-400 border border-slate-700 hover:border-slate-500 hover:text-slate-200',
-                        ].join(' ')}
+                        style={{
+                          fontFamily: "'JetBrains Mono', monospace",
+                          width: '34px',
+                          height: '34px',
+                          borderRadius: '10px',
+                          fontSize: '12px',
+                          fontWeight: 500,
+                          transition: 'all 0.15s ease',
+                          background: batchActive ? '#C9A652' : 'rgba(255,255,255,0.05)',
+                          border: `1px solid ${batchActive ? '#C9A652' : 'rgba(255,255,255,0.1)'}`,
+                          color: batchActive ? '#090910' : '#5C5A74',
+                          boxShadow: batchActive ? '0 0 12px rgba(201,166,82,0.3)' : 'none',
+                        }}
                       >
                         {batch}
                       </button>
@@ -136,22 +163,23 @@ export function SubjectPicker({ groups, onDone, onBack }: Props) {
               ) : (
                 <button
                   onClick={() => toggleSubject(group.subjects[0])}
-                  className={[
-                    'w-6 h-6 rounded border-2 shrink-0 flex items-center justify-center transition-all duration-150',
-                    active
-                      ? 'bg-yellow-400 border-yellow-400 shadow-[0_0_8px_rgba(202,138,4,0.35)]'
-                      : 'border-slate-600 hover:border-slate-400',
-                  ].join(' ')}
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '7px',
+                    border: `1.5px solid ${active ? '#C9A652' : 'rgba(255,255,255,0.15)'}`,
+                    background: active ? '#C9A652' : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    transition: 'all 0.15s ease',
+                    boxShadow: active ? '0 0 10px rgba(201,166,82,0.3)' : 'none',
+                  }}
                 >
                   {active && (
-                    <svg className="w-3 h-3 text-slate-900" fill="none" viewBox="0 0 12 12">
-                      <path
-                        d="M2 6l3 3 5-5"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 6l3 3 5-5" stroke="#090910" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
                 </button>
@@ -161,24 +189,31 @@ export function SubjectPicker({ groups, onDone, onBack }: Props) {
         })}
       </div>
 
-      {/* Sticky bottom CTA */}
+      {/* Sticky CTA */}
       <div
-        className="sticky bottom-0 p-4 pt-8"
-        style={{ background: 'linear-gradient(to top, #0C1220 60%, transparent)' }}
+        className="sticky bottom-0 px-5 pb-8 pt-10"
+        style={{ background: 'linear-gradient(to top, #090910 60%, transparent)' }}
       >
         <button
           disabled={selected.size === 0}
           onClick={() => onDone(Array.from(selected))}
-          style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.12em' }}
-          className={[
-            'w-full py-4 rounded-xl text-sm uppercase font-medium transition-all duration-200',
-            selected.size > 0
-              ? 'bg-yellow-400 text-slate-900 shadow-[0_0_30px_rgba(202,138,4,0.25)] hover:bg-yellow-300 active:scale-[0.99]'
-              : 'bg-slate-800/60 text-slate-600 cursor-not-allowed border border-slate-700/50',
-          ].join(' ')}
+          style={{
+            fontFamily: "'Outfit', sans-serif",
+            letterSpacing: '0.06em',
+            fontWeight: 600,
+            fontSize: '14px',
+            transition: 'all 0.2s ease',
+            background: selected.size > 0 ? '#C9A652' : 'rgba(255,255,255,0.05)',
+            color: selected.size > 0 ? '#090910' : '#3E3C52',
+            border: `1px solid ${selected.size > 0 ? '#C9A652' : 'rgba(255,255,255,0.07)'}`,
+            borderRadius: '14px',
+            padding: '16px',
+            width: '100%',
+            boxShadow: selected.size > 0 ? '0 0 32px rgba(201,166,82,0.2)' : 'none',
+          }}
         >
           {selected.size > 0
-            ? `View Schedule — ${selected.size} Subject${selected.size > 1 ? 's' : ''}`
+            ? `View My Schedule — ${selected.size} Subject${selected.size > 1 ? 's' : ''}`
             : 'Select subjects to continue'}
         </button>
       </div>

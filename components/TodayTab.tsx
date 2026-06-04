@@ -24,16 +24,20 @@ export function TodayTab({ classes }: Props) {
 
   if (todayClasses.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="flex flex-col items-center justify-center py-24 text-center">
         <div
-          style={{ fontFamily: "'Cormorant Garamond', serif" }}
-          className="text-3xl text-slate-600 mb-2 font-semibold italic"
+          style={{ fontFamily: "'Fraunces', serif", color: '#2E2C42', fontWeight: 400 }}
+          className="text-[2rem] italic mb-2"
         >
           Free day
         </div>
         <div
-          style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.15em' }}
-          className="text-[10px] text-slate-700 uppercase"
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            letterSpacing: '0.15em',
+            color: '#28263A',
+          }}
+          className="text-[10px] uppercase"
         >
           No classes scheduled today
         </div>

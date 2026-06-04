@@ -17,9 +17,12 @@ function toISO(d: Date): string {
   ].join('-')
 }
 
-function formatDateHeader(iso: string): string {
+function formatDateHeader(iso: string): { day: string; date: string } {
   const d = new Date(iso + 'T00:00:00')
-  return `${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`
+  return {
+    day: DAYS[d.getDay()],
+    date: `${d.getDate()} ${MONTHS[d.getMonth()]}`,
+  }
 }
 
 export function WeekTab({ classes }: Props) {
@@ -46,16 +49,20 @@ export function WeekTab({ classes }: Props) {
 
   if (byDate.size === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="flex flex-col items-center justify-center py-24 text-center">
         <div
-          style={{ fontFamily: "'Cormorant Garamond', serif" }}
-          className="text-3xl text-slate-600 mb-2 font-semibold italic"
+          style={{ fontFamily: "'Fraunces', serif", color: '#2E2C42', fontWeight: 400 }}
+          className="text-[2rem] italic mb-2"
         >
           Clear week
         </div>
         <div
-          style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.15em' }}
-          className="text-[10px] text-slate-700 uppercase"
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            letterSpacing: '0.15em',
+            color: '#28263A',
+          }}
+          className="text-[10px] uppercase"
         >
           No classes in the next 7 days
         </div>
@@ -64,22 +71,37 @@ export function WeekTab({ classes }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {days.filter(d => byDate.has(d)).map(date => (
-        <div key={date}>
-          <div
-            style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.2em' }}
-            className="text-[9px] text-yellow-600/60 uppercase mb-2.5"
-          >
-            {formatDateHeader(date)}
+    <div className="flex flex-col gap-7">
+      {days.filter(d => byDate.has(d)).map(date => {
+        const { day, date: dateStr } = formatDateHeader(date)
+        return (
+          <div key={date}>
+            <div className="flex items-baseline gap-2 mb-3">
+              <span
+                style={{ fontFamily: "'Fraunces', serif", color: '#F0EDE8', fontWeight: 600 }}
+                className="text-[15px]"
+              >
+                {day}
+              </span>
+              <span
+                style={{
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color: '#3E3C52',
+                  letterSpacing: '0.06em',
+                }}
+                className="text-[11px]"
+              >
+                {dateStr}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              {byDate.get(date)!.map((c, i) => (
+                <ClassCard key={c.dtStart + c.subject} entry={c} index={i} />
+              ))}
+            </div>
           </div>
-          <div className="flex flex-col gap-2">
-            {byDate.get(date)!.map((c, i) => (
-              <ClassCard key={c.dtStart + c.subject} entry={c} index={i} />
-            ))}
-          </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

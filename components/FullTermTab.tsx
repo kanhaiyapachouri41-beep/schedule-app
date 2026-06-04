@@ -9,9 +9,12 @@ interface Props { classes: ClassEntry[] }
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-function formatDateHeader(iso: string): string {
+function formatDateHeader(iso: string): { day: string; date: string } {
   const d = new Date(iso + 'T00:00:00')
-  return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`
+  return {
+    day: DAYS[d.getDay()],
+    date: `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`,
+  }
 }
 
 export function FullTermTab({ classes }: Props) {
@@ -40,51 +43,87 @@ export function FullTermTab({ classes }: Props) {
   }, [filtered])
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Search input */}
+    <div className="flex flex-col gap-5">
+      {/* Search */}
       <div className="relative">
         <input
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder="Search subject, classroom, faculty…"
-          style={{ fontFamily: "'DM Sans', sans-serif", background: '#111827' }}
-          className="w-full px-4 py-3 rounded-xl border border-slate-700/60 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-yellow-500/40 transition-colors"
+          placeholder="Search subject, room, faculty…"
+          style={{
+            fontFamily: "'Outfit', sans-serif",
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '12px',
+            color: '#F0EDE8',
+            fontSize: '14px',
+            width: '100%',
+            padding: '12px 40px 12px 16px',
+            outline: 'none',
+            transition: 'border-color 0.15s',
+          }}
+          onFocus={e => { e.target.style.borderColor = 'rgba(201,166,82,0.3)' }}
+          onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.08)' }}
         />
-        {query && (
+        {query ? (
           <button
             onClick={() => setQuery('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-lg leading-none"
+            style={{ color: '#4E4B65', position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)' }}
+            className="text-lg leading-none hover:text-stone-300 transition-colors"
           >
             ×
           </button>
+        ) : (
+          <svg
+            style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: '#3E3C52' }}
+            width="14" height="14" viewBox="0 0 14 14" fill="none"
+          >
+            <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M10 10l2.5 2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
         )}
       </div>
 
       {byDate.size === 0 && (
         <div
-          style={{ fontFamily: "'JetBrains Mono', monospace" }}
-          className="py-12 text-center text-[11px] text-slate-600 uppercase tracking-widest"
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            letterSpacing: '0.14em',
+            color: '#28263A',
+          }}
+          className="py-16 text-center text-[10px] uppercase"
         >
           No results
         </div>
       )}
 
-      {Array.from(byDate.entries()).map(([date, entries]) => (
-        <div key={date}>
-          <div
-            style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.2em' }}
-            className="text-[9px] text-yellow-600/60 uppercase mb-2.5"
-          >
-            {formatDateHeader(date)}
+      {Array.from(byDate.entries()).map(([date, entries]) => {
+        const { day, date: dateStr } = formatDateHeader(date)
+        return (
+          <div key={date}>
+            <div className="flex items-baseline gap-2 mb-3">
+              <span
+                style={{ fontFamily: "'JetBrains Mono', monospace", color: '#C9A652', letterSpacing: '0.1em' }}
+                className="text-[10px] uppercase"
+              >
+                {day}
+              </span>
+              <span
+                style={{ fontFamily: "'JetBrains Mono', monospace", color: '#3E3C52', letterSpacing: '0.06em' }}
+                className="text-[10px]"
+              >
+                {dateStr}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              {entries.map((c, i) => (
+                <ClassCard key={c.dtStart + c.subject} entry={c} index={i} />
+              ))}
+            </div>
           </div>
-          <div className="flex flex-col gap-2">
-            {entries.map((c, i) => (
-              <ClassCard key={c.dtStart + c.subject} entry={c} index={i} />
-            ))}
-          </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

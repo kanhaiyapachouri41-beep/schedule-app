@@ -3,27 +3,29 @@
 import { Programme } from '@/lib/types'
 import { useState } from 'react'
 
-const PROGRAMMES: { value: Programme; label: string; fullLabel: string; batch: string; desc: string }[] = [
+const PROGRAMMES: {
+  value: Programme; label: string; batchLabel: string; fullLabel: string; abbr: string
+}[] = [
   {
     value: 'PGP-29',
-    label: 'PGP 29',
+    label: 'PGP-29',
+    batchLabel: 'Batch 29',
     fullLabel: 'Post Graduate Programme',
-    batch: 'Batch 29',
-    desc: '6 sections · 50+ electives',
+    abbr: '29',
   },
   {
     value: 'PGPFIN06',
     label: 'PGP Finance',
+    batchLabel: 'Batch 06',
     fullLabel: 'Finance Specialisation',
-    batch: 'Batch 06',
-    desc: 'Finance core + electives',
+    abbr: 'FIN',
   },
   {
     value: 'PGPLSM06',
     label: 'PGP LSM',
+    batchLabel: 'Batch 06',
     fullLabel: 'Liberal Studies & Management',
-    batch: 'Batch 06',
-    desc: 'Liberal studies core + electives',
+    abbr: 'LSM',
   },
 ]
 
@@ -36,86 +38,132 @@ export function ProgrammePicker({ onSelect }: Props) {
 
   function handleSelect(p: Programme) {
     setSelected(p)
-    setTimeout(() => onSelect(p), 180)
+    setTimeout(() => onSelect(p), 200)
   }
 
   return (
-    <div className="flex flex-col min-h-screen p-6 pt-14">
-      <div className="mb-10">
-        <div
-          style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.25em' }}
-          className="text-[10px] text-yellow-600/70 uppercase mb-3"
+    <div className="flex flex-col min-h-screen px-5 pt-14 pb-10">
+      {/* Header */}
+      <div className="mb-10 animate-slideUp">
+        <p
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            letterSpacing: '0.22em',
+            color: 'rgba(201,166,82,0.55)',
+          }}
+          className="text-[9px] uppercase mb-5"
         >
           IIM Kozhikode · Term IV
-        </div>
+        </p>
         <h1
-          style={{ fontFamily: "'Cormorant Garamond', serif" }}
-          className="text-4xl text-slate-100 leading-tight font-normal"
+          style={{
+            fontFamily: "'Fraunces', serif",
+            color: '#F0EDE8',
+            fontWeight: 600,
+            lineHeight: 1.12,
+          }}
+          className="text-[2.4rem]"
         >
-          Select your<br />
-          <em className="text-yellow-400 not-italic font-semibold">Programme</em>
+          Choose your{' '}
+          <em style={{ color: '#C9A652', fontStyle: 'italic' }}>programme</em>
         </h1>
-        <p className="mt-3 text-sm text-slate-400 leading-relaxed">
-          Your schedule will be personalised around<br />your programme and enrolled subjects.
+        <p style={{ color: '#4E4B65', fontFamily: "'Outfit', sans-serif" }} className="text-[14px] mt-3 leading-relaxed">
+          Your timetable will be built around your programme and enrolled subjects.
         </p>
       </div>
 
+      {/* Cards */}
       <div className="flex flex-col gap-3">
-        {PROGRAMMES.map((p) => (
-          <button
-            key={p.value}
-            onClick={() => handleSelect(p.value)}
-            className={[
-              'group relative w-full text-left rounded-xl border transition-all duration-200 p-5',
-              selected === p.value
-                ? 'border-yellow-500/60 bg-yellow-500/5 shadow-[0_0_24px_rgba(202,138,4,0.12)]'
-                : 'border-slate-700/50 bg-slate-800/30 hover:border-slate-600/70 hover:bg-slate-800/50',
-            ].join(' ')}
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div
-                  style={{ fontFamily: "'JetBrains Mono', monospace", letterSpacing: '0.2em' }}
-                  className="text-[9px] text-yellow-600/60 uppercase mb-1.5"
-                >
-                  {p.batch}
-                </div>
-                <div
-                  style={{ fontFamily: "'Cormorant Garamond', serif" }}
-                  className="text-xl text-slate-100 font-semibold leading-tight"
-                >
-                  {p.label}
-                </div>
-                <div className="text-sm text-slate-400 mt-0.5">{p.fullLabel}</div>
-              </div>
-              <div
-                className={[
-                  'mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-200',
-                  selected === p.value
-                    ? 'border-yellow-400 bg-yellow-400'
-                    : 'border-slate-600 group-hover:border-slate-400',
-                ].join(' ')}
-              >
-                {selected === p.value && (
-                  <div className="w-2 h-2 rounded-full bg-slate-900" />
-                )}
-              </div>
-            </div>
-            <div
-              style={{ fontFamily: "'JetBrains Mono', monospace" }}
-              className="mt-3 text-[10px] text-slate-600"
+        {PROGRAMMES.map((p, i) => {
+          const isSelected = selected === p.value
+          return (
+            <button
+              key={p.value}
+              onClick={() => handleSelect(p.value)}
+              className="animate-slideUp text-left w-full"
+              style={{ animationDelay: `${80 + i * 75}ms` }}
             >
-              {p.desc}
-            </div>
-          </button>
-        ))}
+              <div
+                style={{
+                  background: isSelected ? 'rgba(201,166,82,0.07)' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${isSelected ? 'rgba(201,166,82,0.32)' : 'rgba(255,255,255,0.07)'}`,
+                  borderRadius: '14px',
+                  padding: '18px 20px',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  transition: 'border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease',
+                  boxShadow: isSelected ? '0 0 28px rgba(201,166,82,0.07)' : 'none',
+                }}
+              >
+                {/* Watermark abbr */}
+                <div
+                  style={{
+                    fontFamily: "'Fraunces', serif",
+                    fontSize: '68px',
+                    fontWeight: 700,
+                    position: 'absolute',
+                    right: '12px',
+                    bottom: '-16px',
+                    lineHeight: 1,
+                    userSelect: 'none',
+                    pointerEvents: 'none',
+                    letterSpacing: '-0.02em',
+                    color: isSelected ? 'rgba(201,166,82,0.1)' : 'rgba(255,255,255,0.04)',
+                    transition: 'color 0.18s ease',
+                  }}
+                >
+                  {p.abbr}
+                </div>
+
+                <div className="relative">
+                  <p
+                    style={{
+                      fontFamily: "'JetBrains Mono', monospace",
+                      letterSpacing: '0.18em',
+                      color: isSelected ? 'rgba(201,166,82,0.65)' : 'rgba(255,255,255,0.22)',
+                      transition: 'color 0.18s ease',
+                    }}
+                    className="text-[9px] uppercase mb-2"
+                  >
+                    {p.batchLabel}
+                  </p>
+                  <h2
+                    style={{
+                      fontFamily: "'Fraunces', serif",
+                      fontWeight: 600,
+                      color: isSelected ? '#F0EDE8' : '#7E7C96',
+                      transition: 'color 0.18s ease',
+                    }}
+                    className="text-[1.2rem] leading-tight mb-0.5"
+                  >
+                    {p.label}
+                  </h2>
+                  <p
+                    style={{
+                      color: isSelected ? '#6B6882' : '#3E3C52',
+                      fontFamily: "'Outfit', sans-serif",
+                      transition: 'color 0.18s ease',
+                    }}
+                    className="text-[13px]"
+                  >
+                    {p.fullLabel}
+                  </p>
+                </div>
+              </div>
+            </button>
+          )
+        })}
       </div>
 
       <p
-        style={{ fontFamily: "'JetBrains Mono', monospace" }}
-        className="mt-auto pt-10 text-[10px] text-slate-700 text-center tracking-widest"
+        style={{
+          fontFamily: "'JetBrains Mono', monospace",
+          letterSpacing: '0.18em',
+          color: '#28263A',
+        }}
+        className="mt-auto pt-10 text-[9px] uppercase text-center"
       >
-        CHANGEABLE FROM SETTINGS
+        Changeable from settings
       </p>
     </div>
   )
