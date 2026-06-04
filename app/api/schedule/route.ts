@@ -14,8 +14,8 @@ export async function GET() {
 
   try {
     const [scheduleRes, coursesRes] = await Promise.all([
-      fetch(scheduleUrl, { next: { revalidate: 900 } }),
-      fetch(coursesUrl, { next: { revalidate: 900 } }),
+      fetch(scheduleUrl, { cache: 'no-store' }),
+      fetch(coursesUrl, { cache: 'no-store' }),
     ])
 
     if (!scheduleRes.ok || !coursesRes.ok) {
